@@ -43,12 +43,14 @@ def check_slapped(slapper_id, slapped_id):
         players[slapped_id].pos -= 2
         board[slapped.id_][slapped.pos] = slapped.character
 
-cur_player = 0
+curr_player = 0
 
 
 def check_win(player):
     return board[player][-1] != "—"
 def move_player(player, interval):
+    p = players[player]
+    board[p.id_] = ["—"]*len(board[p.id_])
     players[player].pos += interval
 
 def minimax(player, depth, alpha, beta):
@@ -66,33 +68,39 @@ def minimax(player, depth, alpha, beta):
     
     
     
-    if player == "O":
+    if player == curr_player:
+        this = players[player]
         best = -100000
-        for row in range(3):
-            for col in range(3):
-                if board[row][col] == "—":
-                    place_player("O", row, col)
-                    move_value = minimax("X", depth - 1, alpha, beta)[0]
-                    alpha = max(alpha, move_value)
-                    if move_value > best:
-                        best = move_value
-                        [optimal_row, optimal_col] = [row, col]
-                    place_player("—", row, col)
-                    if alpha >= beta:
-                        break
+        
+        for other in range(len(players)):
+            if other == player:
+                continue
+            that = players[other]
+            
+            move_player(player, 1)
+            move_value = minimax(other, depth - 1, alpha, beta)[0]
+            alpha = max(alpha, move_value)
+            if move_value > best:
+                best = move_value
+                [optimal_row, optimal_col] = [this.pos, this.id_]
+            move_player(player, -1)
+            if alpha >= beta:
+                break
         return (best, optimal_row, optimal_col)
+
+        
     else:
         worst = 100000
         for row in range(3):
             for col in range(3):
                 if board[row][col] == "—":
-                    place_player("X", row, col)
+                    move_player("X", row, col)
                     move_value = minimax("O", depth - 1, alpha, beta)[0]
                     beta = min(beta, move_value)
                     if move_value < worst:
                         worst = move_value
                         [optimal_row, optimal_col] = [row, col]
-                    place_player("—", row, col)
+                    move_player("—", row, col)
                     if beta <= alpha:
                         break
         return (worst, optimal_row, optimal_col)
@@ -249,4 +257,4 @@ def move(player):
     return print('End of turn'), time.sleep(0.5), move(player)
 
 
-move(cur_player)
+move(curr_player)
