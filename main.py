@@ -68,38 +68,38 @@ def minimax(player, depth, alpha, beta):
     
     
     
-        for other in range(len(players)):
-            # If its running against itself
-            if other == player:
-                continue
-            this = players[player]
-            that = players[other]
-            if player == curr_player:
-                best = -100000
-                
-                move_player(player, 1)
-                move_value = minimax(other, depth - 1, alpha, beta)[0]
-                alpha = max(alpha, move_value)
-                if move_value > best:
-                    best = move_value
-                    [optimal_row, optimal_col] = [this.pos, this.id_]
-                move_player(player, -1)
-                if alpha >= beta:
-                    break
-                return (best, optimal_row, optimal_col)
-            else:
-                worst = 100000
-                
-                move_player(player, 1)
-                move_value = minimax(other, depth - 1, alpha, beta)[0]
-                beta = min(beta, move_value)
-                if move_value < worst:
-                    worst = move_value
-                    [optimal_row, optimal_col] = [this.pos, this.id_]
-                move_player(player, -1)
-                if beta <= alpha:
-                    break
-                return (best, optimal_row, optimal_col)
+    for other in range(len(players)):
+        # If its running against itself
+        if other == player:
+            pass# continue
+        this = players[player]
+        that = players[other]
+        if other == player:
+            best = -100000
+            
+            move_player(player, 1)
+            move_value = minimax(other, depth - 1, alpha, beta)[0]
+            alpha = max(alpha, move_value)
+            if move_value > best:
+                best = move_value
+                [optimal_row, optimal_col] = [this.pos, this.id_]
+            move_player(player, -1)
+            if alpha >= beta:
+                break
+            return (best, optimal_row, optimal_col)
+        else:
+            worst = 100000
+            
+            move_player(player, 1)
+            move_value = minimax(other, depth - 1, alpha, beta)[0]
+            beta = min(beta, move_value)
+            if move_value < worst:
+                worst = move_value
+                [optimal_row, optimal_col] = [this.pos, this.id_]
+            move_player(player, -1)
+            if beta <= alpha:
+                break
+            return (best, optimal_row, optimal_col)
 
 class Player:
     def __init__(self, *t, **kwargs):
