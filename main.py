@@ -1,8 +1,6 @@
 import random, sys, os, time, modules.colorama as colorama, math
 from modules.colorama import (Fore, Back)
-from copy import deepcopy
-
-
+from cursor import Cursor as c
 
 board = []
 
@@ -37,7 +35,6 @@ players = []
 def check_slapped(slapper_id, slapped_id):
     slapper = players[slapper_id]
     slapped = players[slapped_id]
-    print(slapper.is_slapping and slapped.is_ducking)
     if slapper.is_slapping and not slapped.is_ducking and slapped.is_slapped and slapped.pos > 1:
         board[slapped.id_] = ["—",]*len(board[slapped.id_])
         players[slapped_id].pos -= 2
@@ -83,6 +80,7 @@ def minimax(player, depth, alpha, beta):
             if move_value > best:
                 best = move_value
                 [optimal_row, optimal_col] = [this.pos, this.id_]
+                optimal_move = move_value
             move_player(player, -1)
             if alpha >= beta:
                 break
@@ -123,6 +121,7 @@ class User(Player):
     def __init__(self, *t, **kwargs):
         super().__init__(*t, **kwargs)
     def Move(self, depth, alpha, beta):
+        print(c.restore)
         action = input("""Choose an option:
 (1) Duck
 (2) Slap
@@ -132,7 +131,6 @@ class User(Player):
         if action == "1":
             self.is_ducking = True
         elif action == "2":
-            self.is_slapping = True
             input_value = "\n\nChoose an option:"
             option_count = 1
             for x in players:
@@ -142,6 +140,8 @@ class User(Player):
             input_value += "\n\n> "
             attack = int_input(input_value)
             
+            self.is_slapping = True
+            players[attack].is_slapped = True
         elif action == "3":
             self.pos += 1
         
@@ -171,7 +171,6 @@ class BigBrain(Player):
         board[self.id_] = ["—",]*len(board[self.id_])
         board[self.id_][self.pos] = self.character
         self.ppos = self.pos
-        print('moved')
 
 obj_ = User({
     'name': 'Player',
@@ -213,6 +212,22 @@ obj_ = BigBrain({
 })
 players.append(obj_)
 
+bot_names = ("☺,☻,♥,♦,♣,♠,•,○,♪,£,æ,:,;,>,"+"a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z").split(",")
+for i in bot_names:
+    obj_ = BigBrain({
+        'name': 'Bot '+i,
+        'character': i,
+        'pos': 0,
+        'ppos': 0,
+        'slapped_id': False,
+        'is_slapping': False,
+        'is_slapped': False,
+        'is_ducking': False,
+        'is_going': False,
+        'id_': len(players)
+    })
+    players.append(obj_)
+
 # +["▕ ▘"]
 board = [['—']*10 for i in range(len(players))]
 for x in players:
@@ -225,12 +240,18 @@ def move(player):
     print('Duck, Slap, Go!'"\n\n"+'-'*50+"\n")
     
     
+    print(c.moveTo(4, 1))
     print("\n".join(["  ".join([x for x in y]) for y in board])+"\n\n")
     
     message = ""
     
+    print(c.save)
     for p in players:
         p.Move(2, -math.pow(2, 32), math.pow(2, 32))
+        print(c.moveTo(3, 1))
+        print("\n".join(["  ".join([x for x in y]) for y in board])+"\n\n")
+        time.sleep(0.1)    
+    
     for i in range(len(players)):
         for j in range(len(players)):
             if i == j:
@@ -246,6 +267,7 @@ def move(player):
                 message += f"{i} just slapped {j}\n"
     for i in range(len(players)):
         players[i].is_ducking = players[i].is_slapping = players[i].is_slapped = players[i].slapped_id = False
+    print(players[1].pos)
     print(message)
     if message != "":
         time.sleep(3)
@@ -253,3 +275,8 @@ def move(player):
 
 
 move(curr_player)
+
+
+
+
+
